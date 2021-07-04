@@ -50,7 +50,8 @@ const EditPlanet: React.FC<IPlanet> = ({ planet }) => {
       console.log({ previouslySavedPlanets });
 
       queryClient.setQueryData('savedPlanets', previouslySavedPlanets);
-    }
+    },
+    retry: 3
   });
   const [planetOnEdit, setPlanetOnEdit] = useState<TPlanet>(planet);
 
