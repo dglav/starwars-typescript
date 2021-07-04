@@ -36,7 +36,7 @@ const Planets: React.FC = () => {
     'planets',
     fetchPlanets,
     {
-      staleTime: 5000
+      refetchInterval: 5000
     }
   );
 
