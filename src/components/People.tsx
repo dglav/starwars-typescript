@@ -1,5 +1,6 @@
 import React from 'react';
 import { useInfiniteQuery } from 'react-query';
+import useIntersectionObserver from '../hooks/useIntersectionObserver';
 import Person from './Person';
 
 export type TPerson = {
@@ -47,7 +48,9 @@ const People: React.FC = () => {
     }
   );
 
-  console.log(`data`, data);
+  const setContainerRef = useIntersectionObserver(() => {
+    if (hasNextPage) fetchNextPage();
+  }, status === 'loading');
 
   return (
     <div>
@@ -65,9 +68,7 @@ const People: React.FC = () => {
               </React.Fragment>
             ))}
           </div>
-          <button onClick={() => fetchNextPage()} disabled={!hasNextPage}>
-            Load more
-          </button>
+          <div ref={setContainerRef}></div>
         </>
       )}
     </div>
