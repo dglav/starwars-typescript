@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { db } from '../firebase';
 import { TPlanet } from './Planets';
 
@@ -10,10 +10,21 @@ interface IPlanet {
 const setPlanetDoc = async (planet: TPlanet) => {
   const docRef = await db.collection('planets').add(planet);
   console.info('Document written with ID: ', docRef.id);
+  return planet;
 };
 
 const Planet: React.FC<IPlanet> = ({ planet }) => {
-  const mutation = useMutation(setPlanetDoc);
+  const queryClient = useQueryClient();
+  const mutation = useMutation(setPlanetDoc, {
+    onSuccess: (planet) => {
+      const previouslySavedPlanets: TPlanet[] =
+        queryClient.getQueryData('savedPlanets') ?? [];
+      queryClient.setQueryData('savedPlanets', [
+        ...previouslySavedPlanets,
+        planet
+      ]);
+    }
+  });
 
   return (
     <div className="card">
