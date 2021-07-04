@@ -8,7 +8,7 @@ import People from './components/People';
 const queryClient = new QueryClient();
 
 function App() {
-  const [page, setPage] = useState<'planets' | 'people'>('people');
+  const [page, setPage] = useState<'planets' | 'people'>('planets');
 
   return (
     <QueryClientProvider client={queryClient}>

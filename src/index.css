@@ -56,3 +56,22 @@ button:disabled {
   margin: 10px 0;
   color: #ffff57;
 }
+
+.card button {
+  margin: 10px 0;
+  background: transparent;
+  border: 3px solid #ccc;
+  border-radius: 20px;
+  padding: 10px;
+  color: #ccc;
+  font-size: 1em;
+  cursor: pointer;
+}
+.card button:hover {
+  color: #fff;
+  border-color: #fff;
+}
+.card button:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
