@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, UseQueryResult, useQueryClient } from 'react-query';
 import Planet from './Planet';
 
@@ -35,12 +35,21 @@ const fetchPlanets = async (page: number) => {
 };
 
 const Planets: React.FC = () => {
+  const queryClient = useQueryClient();
   const [page, setPage] = useState<number>(1);
   const { data, status, isPreviousData }: UseQueryResult<TData> = useQuery(
     ['planets', page],
     () => fetchPlanets(page),
     { keepPreviousData: true }
   );
+
+  useEffect(() => {
+    if (data?.next) {
+      queryClient.prefetchQuery(['planets', page + 1], () =>
+        fetchPlanets(page + 1)
+      );
+    }
+  }, [data, page, queryClient]);
 
   return (
     <div>
