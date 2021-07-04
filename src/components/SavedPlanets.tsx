@@ -1,40 +1,9 @@
 import React from 'react';
-import { useQuery, UseQueryResult } from 'react-query';
-import { db } from '../firebase';
+import useQuerySavedPlanets from '../hooks/firestore/useQuerySavedPlanets';
 import EditPlanet from './EditPlanet';
 
-export type TPlanet = {
-  name: string;
-  diameter: string;
-  rotation_period: string;
-  orbital_period: string;
-  gravity: string;
-  population: string;
-  climate: string;
-  terrain: string;
-  surface_water: string;
-  residents: string[];
-  films: string[];
-  url: string;
-  created: string;
-  edited: string;
-};
-
-type TData = TPlanet[];
-
-const fetchSavedPlanets = async () => {
-  const planetsSnapshot = await db.collection('planets').get();
-  return planetsSnapshot.docs.map((planetDoc) => planetDoc.data());
-};
-
 const SavedPlanets: React.FC = () => {
-  const { data, status }: UseQueryResult<TData> = useQuery(
-    'savedPlanets',
-    () => fetchSavedPlanets(),
-    {
-      staleTime: Infinity
-    }
-  );
+  const { data, status } = useQuerySavedPlanets();
 
   return (
     <div>

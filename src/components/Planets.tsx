@@ -1,55 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, UseQueryResult, useQueryClient } from 'react-query';
+import React from 'react';
+import useQueryPlanets from '../hooks/swapi/useQueryPlanets';
 import Planet from './Planet';
 
-export type TPlanet = {
-  name: string;
-  diameter: string;
-  rotation_period: string;
-  orbital_period: string;
-  gravity: string;
-  population: string;
-  climate: string;
-  terrain: string;
-  surface_water: string;
-  residents: string[];
-  films: string[];
-  url: string;
-  created: string;
-  edited: string;
-};
-
-type TData = {
-  results: TPlanet[];
-  count: number;
-  next: string;
-  previous: string;
-};
-
-const fetchPlanets = async (page: number) => {
-  const res = await fetch(`https://swapi.dev/api/planets/?page=${page}`);
-  if (!res.ok) {
-    throw new Error('Network response was not ok');
-  }
-  return res.json();
-};
-
 const Planets: React.FC = () => {
-  const queryClient = useQueryClient();
-  const [page, setPage] = useState<number>(1);
-  const { data, status, isPreviousData }: UseQueryResult<TData> = useQuery(
-    ['planets', page],
-    () => fetchPlanets(page),
-    { keepPreviousData: true }
-  );
-
-  useEffect(() => {
-    if (data?.next) {
-      queryClient.prefetchQuery(['planets', page + 1], () =>
-        fetchPlanets(page + 1)
-      );
-    }
-  }, [data, page, queryClient]);
+  const { data, status, isPreviousData, page, setPage } = useQueryPlanets();
 
   return (
     <div>

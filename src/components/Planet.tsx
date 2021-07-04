@@ -1,30 +1,13 @@
 import React from 'react';
-import { useMutation, useQueryClient } from 'react-query';
-import { db } from '../firebase';
-import { TPlanet } from './Planets';
+import { TPlanet } from '../hooks/firestore/types';
+import useMutatePlanets from '../hooks/firestore/useMutatePlanets';
 
 interface IPlanet {
   planet: TPlanet;
 }
 
-const setPlanetDoc = async (planet: TPlanet) => {
-  const docRef = await db.collection('planets').add(planet);
-  console.info('Document written with ID: ', docRef.id);
-  return planet;
-};
-
 const Planet: React.FC<IPlanet> = ({ planet }) => {
-  const queryClient = useQueryClient();
-  const mutation = useMutation(setPlanetDoc, {
-    onSuccess: (planet) => {
-      const previouslySavedPlanets: TPlanet[] =
-        queryClient.getQueryData('savedPlanets') ?? [];
-      queryClient.setQueryData('savedPlanets', [
-        ...previouslySavedPlanets,
-        planet
-      ]);
-    }
-  });
+  const mutation = useMutatePlanets();
 
   return (
     <div className="card">

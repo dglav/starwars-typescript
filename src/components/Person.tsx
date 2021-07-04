@@ -1,5 +1,5 @@
 import React from 'react';
-import { TPerson } from './People';
+import { TPerson } from '../hooks/swapi/types';
 
 interface IPerson {
   person: TPerson;

@@ -1,52 +1,10 @@
 import React from 'react';
-import { useInfiniteQuery } from 'react-query';
+import useInfiniteQueryPeople from '../hooks/swapi/useInfiniteQueryPeople';
 import useIntersectionObserver from '../hooks/useIntersectionObserver';
 import Person from './Person';
 
-export type TPerson = {
-  name: string;
-  birth_year: string;
-  eye_color: string;
-  gender: string;
-  hair_color: string;
-  height: string;
-  mass: string;
-  skin_color: string;
-  homeworld: string;
-  films: string[];
-  species: string[];
-  starships: string[];
-  vehicles: string[];
-  url: string;
-  created: string;
-  edited: string;
-};
-
-type TData = {
-  results: TPerson[];
-  nextPage: number;
-  count: number;
-  next: string;
-  previous: string;
-};
-
-const fetchPeople = async ({ pageParam = 1 }) => {
-  const res = await fetch(`https://swapi.dev/api/people/?page=${pageParam}`);
-  if (!res.ok) {
-    throw new Error('Network response was not ok');
-  }
-  const json = await res.json();
-  return { ...json, nextPage: json.next && pageParam + 1 };
-};
-
 const People: React.FC = () => {
-  const { data, status, fetchNextPage, hasNextPage } = useInfiniteQuery<TData>(
-    'people',
-    fetchPeople,
-    {
-      getNextPageParam: (lastPage) => lastPage.nextPage
-    }
-  );
+  const { data, status, fetchNextPage, hasNextPage } = useInfiniteQueryPeople();
 
   const setContainerRef = useIntersectionObserver(() => {
     if (hasNextPage) fetchNextPage();
