@@ -75,3 +75,7 @@ button:disabled {
   opacity: 0.2;
   cursor: not-allowed;
 }
+.card .error {
+  border-color: #ff5757;
+  color: #ff5757;
+}
