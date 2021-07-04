@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { db } from '../firebase';
 import { TPlanet } from './Planets';
 
@@ -17,19 +17,37 @@ const setPlanetDoc = async (planet: TPlanet) => {
   const planetId = planetSnapshot.docs.map((planetDoc) => planetDoc.id)[0];
   await db.collection('planets').doc(planetId).update(planet);
   console.info('Document updated with ID: ', planetId);
+  return planet;
 };
 
 const EditPlanet: React.FC<IPlanet> = ({ planet }) => {
-  const mutation = useMutation(setPlanetDoc);
+  const queryClient = useQueryClient();
+  const mutation = useMutation(setPlanetDoc, {
+    onSuccess: (data) => {
+      const previouslySavedPlanets: TPlanet[] =
+        queryClient.getQueryData('savedPlanets') ?? [];
+      const updatedPlanet = data;
+      queryClient.setQueryData(
+        'savedPlanets',
+        previouslySavedPlanets.map((previouslySavedPlanet) =>
+          updatedPlanet.name === previouslySavedPlanet.name
+            ? updatedPlanet
+            : previouslySavedPlanet
+        )
+      );
+    }
+  });
   const [planetOnEdit, setPlanetOnEdit] = useState<TPlanet>(planet);
 
   return (
     <div className="card">
       <h3>{planet.name}</h3>
       <form>
-        <label htmlFor="population">Population: {planet.population}</label>
+        <label htmlFor={`${planet.name}_population`}>
+          Population: {planet.population}
+        </label>
         <input
-          id="population"
+          id={`${planet.name}_population`}
           type="number"
           value={planetOnEdit.population}
           onChange={(updatedPopulation) => {
@@ -39,9 +57,11 @@ const EditPlanet: React.FC<IPlanet> = ({ planet }) => {
             }));
           }}
         />
-        <label htmlFor="terrain">Terrain: {planet.terrain}</label>
+        <label htmlFor={`${planet.name}_terrain`}>
+          Terrain: {planet.terrain}
+        </label>
         <input
-          id="terrain"
+          id={`${planet.name}_terrain`}
           value={planetOnEdit.terrain}
           onChange={(updatedTerrain) => {
             setPlanetOnEdit((planetOnEdit) => ({
@@ -50,9 +70,11 @@ const EditPlanet: React.FC<IPlanet> = ({ planet }) => {
             }));
           }}
         />
-        <label htmlFor="climate">Climate: {planet.climate}</label>
+        <label htmlFor={`${planet.name}_climate`}>
+          Climate: {planet.climate}
+        </label>
         <input
-          id="climate"
+          id={`${planet.name}_climate`}
           value={planetOnEdit.climate}
           onChange={(updatedClimate) => {
             setPlanetOnEdit((planetOnEdit) => ({

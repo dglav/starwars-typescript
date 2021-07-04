@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery, UseQueryResult } from 'react-query';
 import { db } from '../firebase';
 import EditPlanet from './EditPlanet';
@@ -35,8 +35,6 @@ const SavedPlanets: React.FC = () => {
       staleTime: Infinity
     }
   );
-
-  console.log(`data`, data);
 
   return (
     <div>
