@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from 'react-query';
+import { useInfiniteQuery } from 'react-query';
 import Person from './Person';
 
 export type TPerson = {
@@ -23,18 +23,31 @@ export type TPerson = {
 
 type TData = {
   results: TPerson[];
+  nextPage: number;
+  count: number;
+  next: string;
+  previous: string;
 };
 
-const fetchPeople = async () => {
-  const res = await fetch('https://swapi.dev/api/people/');
+const fetchPeople = async ({ pageParam = 1 }) => {
+  const res = await fetch(`https://swapi.dev/api/people/?page=${pageParam}`);
   if (!res.ok) {
     throw new Error('Network response was not ok');
   }
-  return res.json();
+  const json = await res.json();
+  return { ...json, nextPage: json.next && pageParam + 1 };
 };
 
 const People: React.FC = () => {
-  const { data, status } = useQuery<TData>('people', fetchPeople);
+  const { data, status, fetchNextPage, hasNextPage } = useInfiniteQuery<TData>(
+    'people',
+    fetchPeople,
+    {
+      getNextPageParam: (lastPage) => lastPage.nextPage
+    }
+  );
+
+  console.log(`data`, data);
 
   return (
     <div>
@@ -44,10 +57,17 @@ const People: React.FC = () => {
       {status === 'success' && (
         <>
           <div>
-            {data?.results.map((person) => (
-              <Person key={person.name} person={person} />
+            {data?.pages.map((group, i) => (
+              <React.Fragment key={i}>
+                {group.results.map((person) => (
+                  <Person key={person.name} person={person} />
+                ))}
+              </React.Fragment>
             ))}
           </div>
+          <button onClick={() => fetchNextPage()} disabled={!hasNextPage}>
+            Load more
+          </button>
         </>
       )}
     </div>
