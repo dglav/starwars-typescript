@@ -38,7 +38,8 @@ const Planets: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const { data, status, isPreviousData }: UseQueryResult<TData> = useQuery(
     ['planets', page],
-    () => fetchPlanets(page)
+    () => fetchPlanets(page),
+    { keepPreviousData: true }
   );
 
   return (
