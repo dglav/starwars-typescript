@@ -79,3 +79,10 @@ button:disabled {
   border-color: #ff5757;
   color: #ff5757;
 }
+
+.card form {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 8px;
+}
