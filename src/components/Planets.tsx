@@ -34,7 +34,10 @@ const fetchPlanets = async () => {
 const Planets: React.FC = () => {
   const { data, status }: UseQueryResult<TData> = useQuery(
     'planets',
-    fetchPlanets
+    fetchPlanets,
+    {
+      staleTime: 5000
+    }
   );
 
   return (
