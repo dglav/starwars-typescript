@@ -22,19 +22,34 @@ const setPlanetDoc = async (planet: TPlanet) => {
 
 const EditPlanet: React.FC<IPlanet> = ({ planet }) => {
   const queryClient = useQueryClient();
-  const mutation = useMutation(setPlanetDoc, {
-    onSuccess: (data) => {
+  const mutation = useMutation<
+    TPlanet,
+    TPlanet,
+    TPlanet,
+    { previouslySavedPlanets: TPlanet[] }
+  >(setPlanetDoc, {
+    onMutate: (planet) => {
+      const optimisticPlanet = planet;
+
       const previouslySavedPlanets: TPlanet[] =
         queryClient.getQueryData('savedPlanets') ?? [];
-      const updatedPlanet = data;
+
       queryClient.setQueryData(
         'savedPlanets',
         previouslySavedPlanets.map((previouslySavedPlanet) =>
-          updatedPlanet.name === previouslySavedPlanet.name
-            ? updatedPlanet
+          optimisticPlanet.name === previouslySavedPlanet.name
+            ? optimisticPlanet
             : previouslySavedPlanet
         )
       );
+
+      return { previouslySavedPlanets };
+    },
+    onError: (_, __, context) => {
+      const previouslySavedPlanets = context!.previouslySavedPlanets;
+      console.log({ previouslySavedPlanets });
+
+      queryClient.setQueryData('savedPlanets', previouslySavedPlanets);
     }
   });
   const [planetOnEdit, setPlanetOnEdit] = useState<TPlanet>(planet);
@@ -84,20 +99,9 @@ const EditPlanet: React.FC<IPlanet> = ({ planet }) => {
           }}
         />
       </form>
-      {!mutation.error ? (
-        <>
-          <button
-            onClick={() => mutation.mutate(planetOnEdit)}
-            disabled={mutation.isLoading}
-          >
-            Save to database
-          </button>
-        </>
-      ) : (
-        <button onClick={() => mutation.reset()} className="error">
-          Reset because of error
-        </button>
-      )}
+      <button onClick={() => mutation.mutate(planetOnEdit)}>
+        Save to database
+      </button>
     </div>
   );
 };
